@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import { pool } from "./utils/db.mjs";
+import { validatePost } from "./middleware/postValidattion.mjs";
 
 const app = express();
 const port = process.env.PORT || 4001;
@@ -132,7 +133,7 @@ app.get("/posts/:postId", async (req, res) => {
   });
 });
 
-app.post("/posts", async (req, res) => {
+app.post("/posts", [validatePost], async (req, res) => {
   const newPost = req.body;
 
   // ต้องเอาเงื่อนไขที่เช็คว่าข้อมูลที่ส่งมามีข้อมูลครบไหม ขึ้นก่อนไม่งั้นจะเข้า error 500
@@ -172,7 +173,7 @@ app.post("/posts", async (req, res) => {
   return res.status(201).json({ message: "Created post sucessfully" });
 });
 
-app.put("/posts/:postId", async (req, res) => {
+app.put("/posts/:postId", [validatePost], async (req, res) => {
   const postIdFromClient = req.params.postId;
   const updatedPost = { ...req.body, date: new Date() };
   try {
